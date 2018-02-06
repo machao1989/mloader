@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>mload</title>
+    <script src="eruda.js"></script>
+    <script>eruda.init();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js"></script>
+    <script src="mload.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="bd-title" id="content">Mload</h1>
+            <p>
+
+            </p>
+        </div>
+        <div class="col-12">
+            <div>
+                <form class="form-horizontal" id="cf">
+                    <fieldset class="form-group">
+                        <input type="text" name="searchC" class="form-control" placeholder="搜索">
+                    </fieldset>
+
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-primary">
+                            <input type="radio" name="options" value="1" autocomplete="off" > Radio 1
+                        </label>
+                        <label class="btn btn-primary active">
+                            <input type="radio" name="options" value="2" autocomplete="off" checked> Radio 2
+                        </label>
+                        <label class="btn btn-primary">
+                            <input type="radio" name="options" value="3" autocomplete="off"> Radio 3
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div style="height: 200px;overflow: auto;margin-bottom: 20px;">
+                <ul  class="list-group"  id="c" >
+
+                </ul>
+                <div class="loadmorec text-center">...</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <form id="filter">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" placeholder="Search for...">
+                    <span class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit" >搜索</button>
+                    </span>
+                </div>
+            </form>
+
+            <div style="height: 200px;overflow: auto;margin-bottom: 20px;">
+                <ul  class="list-group"  id="sc" >
+
+                </ul>
+                <div class="loadmore">...</div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <form class=""><input type="text" name="model" value="" class="input-control"></form>
+            <div id="list">
+
+            </div>
+            <div class="listmore" style="height: 50px;">...</div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" >
+    $(function () {
+
+        var spinopts = {
+            //lines: 13, // The number of lines to draw
+            //length: 28, // The length of each line
+            width: 2, // The line thickness
+            radius: 10, // The radius of the inner circle
+            scale: 1, // Scales overall size of the spinner
+            corners: 1, // Corner roundness (0..1)
+            color: '#999', // #rgb or #rrggbb or array of colors
+            opacity: 0.25, // Opacity of the lines
+            rotate: 0, // The rotation offset
+            direction: 1, // 1: clockwise, -1: counterclockwise
+            speed: 1, // Rounds per second
+            trail: 60, // Afterglow percentage
+            fps: 20, // Frames per second when using setTimeout() as a fallback in IE 9
+            zIndex: 2e9, // The z-index (defaults to 2000000000)
+            className: 'spinner', // The CSS class to assign to the spinner
+            top: '50%', // Top position relative to parent
+            left: '50%', // Left position relative to parent
+            shadow: false, // Whether to render a shadow
+            position:'relative',
+        };
+        //初始化
+        $('#c').mload({
+            protect:'.loadmorec',
+            filter:function (i) {
+                var filter = {}
+                filter = $('#cf').change(function () {
+                    //条件改变时重新加载列表
+                    i.setfilter($(this).serializeArray()).reload()
+                }).serializeArray()
+                return filter;
+            },//传入初始条件
+            loadprocess:function (i) {//过滤参数
+                var target = $(i.target)
+                var filter = i.filter
+                filter['limit'] = 10
+                filter['skip'] = i.offset* filter['limit']
+
+                i.ajax({
+                    url:'c.php',
+                    type:'GET',
+                    data:filter,
+                    success:function (response,status) {
+                        if(response.end===true){
+                            i.end=true;
+                        }
+                        $(target).append(response)
+                        $('.loadmorec').text('加载完成')
+
+                    },
+                    error:function (response,status) {
+
+                    }
+                })
+            },
+            loadevent:'scrollbottom',
+            beforeLoad:function (i) {
+                var spinner = new Spinner(spinopts).spin($('.loadmorec').get(0));
+            },
+            completed:function (jqHXR) {
+                $('.loadmorec').text('没有更多内容')
+            }
+        })
+
+        $('#sc').mload({
+            protect:'',
+            filter:function (i) {
+                var filter={};
+                filter = $('#filter').submit(function () {
+                    i.setfilter($(this).serializeArray()).reload()
+                    return false;
+                }).serializeArray()
+                return filter;
+            },//传入初始条件
+            loadprocess:function (i) {//过滤参数
+                var target = $(i.target)
+                var filter = i.filter
+                filter['limit'] = 10
+                filter['skip'] = i.offset* filter['limit']
+
+                i.ajax({
+                    url:'sc.php',
+                    type:'GET',
+                    dataType:'html',
+                    data:filter,
+                    success:function (response,status) {
+                        $(target).append(response)
+                        $('.loadmore').text('加载完成')
+                    },
+                    error:function (response,status) {
+
+                    }
+                })
+            },
+            loadevent:'scrollbottom',
+            beforeLoad:function (i) {
+                $('.loadmore').text('加载中..')
+            },
+            completed:function (jqHXR) {
+                $('.loadmore').text('没有更多内容')
+            }
+        })
+
+        //插件初始化
+        $('#list').mload({
+            protect:'',
+            mab:100,
+            filter:function (i) {
+                var filter = {}
+                $('input[name=model]').each(function (i,n) {
+                    var field = $(this).attr('name')
+                    filter[field] = $(this).val()//初始过滤条件
+                }).change(function () {
+                    //条件改变时重新加载列表
+                    var field = $(this).attr('name')
+                    filter[field] = $(this).val()
+                    i.setfilter(filter).reload()
+                })
+                return filter;
+            },//传入初始条件
+            loadprocess:function (i) {//过滤参数
+                var target = $(i.target)
+                var filter = i.filter
+                filter['limit'] = 5
+                filter['skip'] = i.offset* filter['limit']
+
+                i.ajax({
+                    url:'p.php',
+                    type:'GET',
+                    dataType:'html',
+                    data:filter,
+                    success:function (response,status) {
+                        $(target).append(response)
+                        $('.listmore').text('加载完成')
+                    },
+                    error:function (response,status) {
+
+                    }
+                })
+            },
+            loadevent:'scrollbottom',
+            beforeLoad:function (i) {
+                var spinner = new Spinner(spinopts).spin($('.listmore').html('').get(0));
+            },
+            completed:function (jqHXR) {
+                $('.listmore').text('没有更多内容')
+            }
+        })
+    })
+</script>
+</body>
+</html>
