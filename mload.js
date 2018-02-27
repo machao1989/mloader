@@ -10,12 +10,11 @@
     //默认选项
     var r = {
         filter:{},
-        loadevent:'',//事件使用
         beforeLoad:function () {},//加载之前 return false可阻止加载
         completed:function (n) {},//全部加载完成后回调
         protect:null,
         mab:50,//预加载高度(px)
-        pull:50//顶部下拉刷新(px)
+        //pull:50//顶部下拉刷新(px)
     };
     var on=false,eon=false,pon=false
     function sbtm(e) {
@@ -29,9 +28,7 @@
             $(self.c).trigger('unenough',[self])
         }
     }
-    $('body').on('onpageshow',function (e) {
-        console.log('onpageshow',e)
-    })
+
     var i = function (e,n,i) {
         this.target=e //容器
         this.idx=i //单例标识

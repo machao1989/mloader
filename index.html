@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>mload</title>
-    <script src="eruda.js"></script>
-    <script>eruda.init();</script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js"></script>
+
+    <link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/atom-one-light.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
     <script src="mload.js"></script>
 
 </head>
@@ -20,15 +24,90 @@
         <div class="col-12">
             <h1 class="bd-title" id="content">Mload</h1>
             <p>
-
+                移动端专用的异步列表加载插件
             </p>
+            <div>
+                灵活支持各种过滤参数
+                <br>
+                列表内容返回后台还原列表页状态
+                <span>比如商品列表，新闻列表进入内容页后，回退到列表页时可还原列表的操作状态</span>
+                <br>
+            </div>
         </div>
+
         <div class="col-12">
+            <h4>Useage</h4>
+            <pre>
+                <code>
+&lt;script src="mload.js"&gt;&lt;/script&gt;
+                </code>
+            </pre>
+            <p>初始化</p>
+            <pre>
+                <code>
+$(function () {
+    $('#c').mload({//'#c'是一个高度可变容器，他的父节点可以是固定高的容器，也可以不指定这个父节点，这样就以页面窗口作固定高的容器。
+        protect:'.loadmorec,.loadmore',//保护指定的容器下的内容，可指定多个需要保护的容器
+        filter:function (i) {//第一个参数i为对象实例
+            var filter = {}
+            filter = $('#cf').change(function () {
+                //条件改变时重新加载列表
+                i.setfilter($(this).serializeArray()).reload()
+            }).serializeArray()a
+            return filter;//这里返回初始的过滤条件对象，有效示例：{'age':28,'name':'andy'} or  [{name: 'age', value: 28},{name: 'name', value: 'andy'}]
+        },//初始数据过滤条件
+        loadprocess:function (i) {//列表数据加载
+            var target = $(i.target)
+            var filter = i.filter
+            filter['limit'] = 10
+            filter['skip'] = i.offset* filter['limit']
+
+            i.ajax({ //此处ajax方法用法和$.ajax一致，但是不能用$.ajax代替
+                url:'c.php',
+                type:'GET',
+                data:filter,
+                success:function (response,status) {
+                    if(response.end===true){
+                        i.end=true;//标记列表数据已经全部加载完毕，这时会回调completed
+                    }
+                    $(target).append(response) //将获取到的内容追加到列表容器，通常是html内容，当然也可以是其它形式的数据（如json）处理成html内容后追加
+                    $('.loadmorec').text('加载完成')
+                },
+                error:function (response,status) {
+                    //do something
+                }
+            })
+        },
+        beforeLoad:function (i) {//即将开始加载列表页之前回调，通常可以做一些loading效果
+            $('.loadmorec').text('加载中..')
+        },
+        completed:function (jqHXR) {//列表全部加载完成时回调
+            $('.loadmorec').text('没有更多内容')
+        }
+    })
+})
+                </code>
+            </pre>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $('code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
+                });
+            </script>
+        </div>
+
+        <div class="col-12">
+            <h4>Demo</h4>
             <div>
                 <form class="form-horizontal" id="cf">
-                    <fieldset class="form-group">
-                        <input type="text" name="searchC" class="form-control" placeholder="搜索">
-                    </fieldset>
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="searchC" placeholder="Search for...">
+                        <span class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit" >搜索</button>
+                    </span>
+                    </div>
 
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                         <label class="btn btn-primary">
@@ -47,7 +126,7 @@
                 <ul  class="list-group"  id="c" >
 
                 </ul>
-                <div class="loadmorec text-center">...</div>
+                <div class="loadmorec text-center"  style="height: 50px;line-height: 50px;">...</div>
             </div>
 
         </div>
@@ -55,27 +134,14 @@
 
     <div class="row">
         <div class="col-12">
-            <form id="filter">
+            <form class="form-horizontal">
                 <div class="input-group">
-                    <input type="text" class="form-control" name="search" placeholder="Search for...">
+                    <input type="text" class="form-control" name="model" placeholder="Search for...">
                     <span class="input-group-append">
                         <button class="btn btn-outline-secondary" type="submit" >搜索</button>
                     </span>
                 </div>
             </form>
-
-            <div style="height: 200px;overflow: auto;margin-bottom: 20px;">
-                <ul  class="list-group"  id="sc" >
-
-                </ul>
-                <div class="loadmore">...</div>
-            </div>
-
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <form class=""><input type="text" name="model" value="" class="input-control"></form>
             <div id="list">
 
             </div>
@@ -86,6 +152,7 @@
 <script type="text/javascript" >
     $(function () {
 
+        //loading特效插件，你可以选择其它效果配合使用
         var spinopts = {
             //lines: 13, // The number of lines to draw
             //length: 28, // The length of each line
@@ -107,17 +174,23 @@
             shadow: false, // Whether to render a shadow
             position:'relative',
         };
+
         //初始化
         $('#c').mload({
-            protect:'.loadmorec',
+            protect:'.loadmorec,.loadmore',//保护指定的容器下的内容，可指定多个需要保护的容器
+            mab:50,
             filter:function (i) {
                 var filter = {}
                 filter = $('#cf').change(function () {
                     //条件改变时重新加载列表
                     i.setfilter($(this).serializeArray()).reload()
+                }).submit(function () {
+                    //提交过滤表单时重新加载列表
+                    i.setfilter($(this).serializeArray()).reload()
+                    return false;
                 }).serializeArray()
                 return filter;
-            },//传入初始条件
+            },//初始数据过滤条件
             loadprocess:function (i) {//过滤参数
                 var target = $(i.target)
                 var filter = i.filter
@@ -137,55 +210,15 @@
 
                     },
                     error:function (response,status) {
-
+                        //do something
                     }
                 })
             },
-            loadevent:'scrollbottom',
             beforeLoad:function (i) {
-                var spinner = new Spinner(spinopts).spin($('.loadmorec').get(0));
+                var spinner = new Spinner(spinopts).spin($('.loadmorec').html('').get(0));
             },
             completed:function (jqHXR) {
                 $('.loadmorec').text('没有更多内容')
-            }
-        })
-
-        $('#sc').mload({
-            protect:'',
-            filter:function (i) {
-                var filter={};
-                filter = $('#filter').submit(function () {
-                    i.setfilter($(this).serializeArray()).reload()
-                    return false;
-                }).serializeArray()
-                return filter;
-            },//传入初始条件
-            loadprocess:function (i) {//过滤参数
-                var target = $(i.target)
-                var filter = i.filter
-                filter['limit'] = 10
-                filter['skip'] = i.offset* filter['limit']
-
-                i.ajax({
-                    url:'sc.php',
-                    type:'GET',
-                    dataType:'html',
-                    data:filter,
-                    success:function (response,status) {
-                        $(target).append(response)
-                        $('.loadmore').text('加载完成')
-                    },
-                    error:function (response,status) {
-
-                    }
-                })
-            },
-            loadevent:'scrollbottom',
-            beforeLoad:function (i) {
-                $('.loadmore').text('加载中..')
-            },
-            completed:function (jqHXR) {
-                $('.loadmore').text('没有更多内容')
             }
         })
 
@@ -203,6 +236,10 @@
                     var field = $(this).attr('name')
                     filter[field] = $(this).val()
                     i.setfilter(filter).reload()
+                }).submit(function () {
+                    //提交过滤表单时重新加载列表
+                    i.setfilter($(this).serializeArray()).reload()
+                    return false;
                 })
                 return filter;
             },//传入初始条件
@@ -222,11 +259,10 @@
                         $('.listmore').text('加载完成')
                     },
                     error:function (response,status) {
-
+                        //do something
                     }
                 })
             },
-            loadevent:'scrollbottom',
             beforeLoad:function (i) {
                 var spinner = new Spinner(spinopts).spin($('.listmore').html('').get(0));
             },
