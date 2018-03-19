@@ -147,11 +147,11 @@
         var ajax = $.extend(ajaxoption,{
             success:function (response,status) {
                 optionclone.success(response,status)
-                self.loaded(response,status)
+                self.loaded(response,status,self)
             },
             error:function (jqXHR,status,errorThrown) {
                 optionclone.error(jqXHR,status)
-                self.loaded(jqXHR,status)
+                self.loaded(jqXHR,status,self)
             }
         })
         $.ajax(ajax)
@@ -192,7 +192,7 @@
             }
         }else{
             this.end=true//加载出错或加载全部完成标记end
-            this.option.completed(response,status)
+            this.option.completed(response,status,this)
         }
     }
 

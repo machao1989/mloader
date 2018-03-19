@@ -27,11 +27,12 @@
                 移动端专用的异步列表加载插件
             </p>
             <div>
-                灵活支持各种过滤参数
+                灵活支持各种过滤参数。
                 <br>
-                列表内容返回后台还原列表页状态
-                <span>比如商品列表，新闻列表进入内容页后，回退到列表页时可还原列表的操作状态</span>
+                列表内容返回后可还原列表页状态。
+                <span>比如商品列表，新闻列表进入内容页后，回退到列表页时可还原列表的操作状态。</span>
                 <br>
+                一个页面支持多个实例。
             </div>
         </div>
 
@@ -39,6 +40,7 @@
             <h4>Useage</h4>
             <pre>
                 <code>
+&lt;script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"&gt;&lt;/script&gt;
 &lt;script src="mload.js"&gt;&lt;/script&gt;
                 </code>
             </pre>
@@ -88,14 +90,100 @@ $(function () {
 })
                 </code>
             </pre>
-            <script type="text/javascript">
-                $(document).ready(function() {
-                    $('code').each(function(i, block) {
-                        hljs.highlightBlock(block);
-                    });
-                });
-            </script>
+
         </div>
+
+        <div class="col-12">
+            <h4>Options</h4>
+            <p>
+                <code>protect</code>: (string)
+                <br>
+                使用jquery选择器指定保护当前页面上的部分html结构。回退时可以还原html结构。
+            </p>
+
+            <p>
+                <code>mab</code>: (int)
+                <br>
+                定义预加载高度，当滑动离窗口或容器底部小于该像素高度时，开始加载下一页列表。
+            </p>
+
+            <p>
+                <code>filter</code>: (obj,function or array)
+                <br>
+                初始过滤，列表在初始时通常会首次加载前几页列表数据，可以为其指定初始过滤条件。
+                <br>
+                示例：
+            <pre>
+            <code>{'age':28,'name':'andy'} or  [{name: 'age', value: 28},{name: 'name', value: 'andy'}] ($.serializeArray()的返回形式)
+            </code>
+            </pre>
+
+                <br>
+                通常建议使用function来处理，这样做的好处就是可以在方法体中完成其它一些初始操作，请参考demo.
+            </p>
+
+            <h4>实例属性</h4>
+            <p>
+                <code>target</code>
+                <br>
+                放置列表内容的目标容器选择器字符串。
+            </p>
+            <p>
+                <code>offset</code>
+                <br>
+                分页偏移量，初始偏移为0。每加向后加载一次，offset自增1。通常用于计算数据库query的skip值。
+            </p>
+
+            <p>
+                <code>end</code>
+                <br>
+                手动end=true时，标记本列表实例已经全部加载完毕。
+                <br>
+                此属性也可以自动标记，当单次分页加载完毕后，目标容器的高度没有再增加或者ajax的status不等于success时，则自动end=true.
+
+            </p>
+
+            <h4>实例方法</h4>
+            <p>
+                <code>setfilter(filter)</code>
+                <br>
+                更新过滤条件，数据格式同 <code>filter</code>属性。
+            </p>
+
+            <p>
+                <code>reload()</code>
+                <br>
+                offset置为0，实现重新让列表从首页偏移开始加载，通常配合 <code>setfilter(filter)</code>连贯使用。
+            </p>
+
+            <p>
+                <code>ajax()</code>
+                <br>
+                异常加分页数据方法，用法同jQuery.ajax(),但是不能用代替使用，否则无法正确触发completed事件。
+            </p>
+
+            <h4>事件</h4>
+            <p>
+                <code>loadprocess(i)</code>
+                <br>
+                开始加载新列表页，第一个参数i即实例对象，可以访问到target,offset属性，还可以标记end属性。
+                重点，这里请使用i.ajax()去请求新列表页面，用法和jQuery.ajax()方法一致。并且你需要自己处理响应结果。
+            </p>
+            <p>
+                <code>beforeLoad(i)</code>
+                <br>
+                第一个参数i即实例对象。
+                即将开始加载列表页之前回调，通常可以做一些loading效果
+            </p>
+            <p>
+                <code>completed(response,status,i)</code>
+                <br>
+                参数i即实例对象。
+                列表全部加载完成时回调。
+            </p>
+
+        </div>
+
 
         <div class="col-12">
             <h4>Demo</h4>
@@ -151,6 +239,9 @@ $(function () {
 </div>
 <script type="text/javascript" >
     $(function () {
+        $('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+        });
 
         //loading特效插件，你可以选择其它效果配合使用
         var spinopts = {
@@ -271,6 +362,9 @@ $(function () {
             }
         })
     })
+
+
 </script>
+
 </body>
 </html>
