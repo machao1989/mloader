@@ -18,5 +18,7 @@
    一个页面支持多个实例。
 
  文档参见:https://machao1989.github.io/mloader/index.html
+ 
+ 查看[Demo](http://tbhchao101.7debusx.c28.542b.top//mload/demo/index.html)
 
  文档里的demo里，由于没有动态脚本php支持，所以不能体现好，建议下载源码后自建php站点查看demo.
