@@ -14,7 +14,7 @@
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 
-    <script src="mload.js"></script>
+    <script src="../src/mload.js"></script>
 
 </head>
 <body>
@@ -52,7 +52,7 @@ $(function () {
         protect:'.loadmorec,.loadmore',//保护指定的容器下的内容，可指定多个需要保护的容器
         filter:function (i) {//第一个参数i为对象实例
             var filter = {}
-            filter = $('#cf').change(function () {
+            filter = $('#cf').change(function () {//同时这也是一个初始方法，可以做一些事件操作，return的数据作为初始过滤条件
                 //条件改变时重新加载列表
                 i.setfilter($(this).serializeArray()).reload()
             }).serializeArray()a
@@ -186,12 +186,15 @@ $(function () {
 
 
         <div class="col-12">
-            <h4>Demo</h4>
+            <h4>Demo1</h4>
+            <p>
+                这是一个高度固定的容器。
+            </p>
             <div>
                 <form class="form-horizontal" id="cf">
 
                     <div class="input-group">
-                        <input type="text" class="form-control" name="searchC" placeholder="Search for...">
+                        <input type="text" class="form-control" name="search" placeholder="关键字搜索">
                         <span class="input-group-append">
                         <button class="btn btn-outline-secondary" type="submit" >搜索</button>
                     </span>
@@ -199,18 +202,18 @@ $(function () {
 
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                         <label class="btn btn-primary">
-                            <input type="radio" name="options" value="1" autocomplete="off" > Radio 1
+                            <input type="radio" name="radio" value="male" autocomplete="off" > 男
                         </label>
                         <label class="btn btn-primary active">
-                            <input type="radio" name="options" value="2" autocomplete="off" checked> Radio 2
+                            <input type="radio" name="radio" value="female" autocomplete="off" checked> 女
                         </label>
                         <label class="btn btn-primary">
-                            <input type="radio" name="options" value="3" autocomplete="off"> Radio 3
+                            <input type="radio" name="radio" value="unknow" autocomplete="off"> 未知
                         </label>
                     </div>
                 </form>
             </div>
-            <div style="height: 200px;overflow: auto;margin-bottom: 20px;">
+            <div style="height: 200px;overflow: auto;margin-bottom: 20px;"><!--固定高度的容器-->
                 <ul  class="list-group"  id="c" >
 
                 </ul>
@@ -220,17 +223,21 @@ $(function () {
         </div>
     </div>
 
+    <h4>Demo2</h4>
+    <p>
+        parents中没有一个是固定高度的容器，就以可视范围为容器
+    </p>
     <div class="row">
         <div class="col-12">
-            <form class="form-horizontal">
+            <form class="form-horizontal" id="demo">
                 <div class="input-group">
-                    <input type="text" class="form-control" name="model" placeholder="Search for...">
+                    <input type="text" class="form-control" name="find" placeholder="Find...">
                     <span class="input-group-append">
                         <button class="btn btn-outline-secondary" type="submit" >搜索</button>
                     </span>
                 </div>
             </form>
-            <div id="list">
+            <div id="list"><!--parents中没有一个是固定高度的容器，就以可视范围为容器-->
 
             </div>
             <div class="listmore" style="height: 50px;">...</div>
@@ -270,12 +277,13 @@ $(function () {
         $('#c').mload({
             protect:'.loadmorec,.loadmore',//保护指定的容器下的内容，可指定多个需要保护的容器
             mab:50,
-            filter:function (i) {
+            filter:function (i) {//同时这也是一个初始方法，可以做一些事件操作，return的数据作为初始过滤条件
                 var filter = {}
                 filter = $('#cf').change(function () {
                     //条件改变时重新加载列表
                     i.setfilter($(this).serializeArray()).reload()
-                }).submit(function () {
+                }).submit(function (e) {
+                    e.preventDefault();
                     //提交过滤表单时重新加载列表
                     i.setfilter($(this).serializeArray()).reload()
                     return false;
@@ -317,21 +325,17 @@ $(function () {
         $('#list').mload({
             protect:'',
             mab:100,
-            filter:function (i) {
+            filter:function (i) {//同时这也是一个初始方法，可以做一些事件操作，return的数据作为初始过滤条件
                 var filter = {}
-                $('input[name=model]').each(function (i,n) {
-                    var field = $(this).attr('name')
-                    filter[field] = $(this).val()//初始过滤条件
-                }).change(function () {
+                filter = $('#demo').change(function () {
                     //条件改变时重新加载列表
-                    var field = $(this).attr('name')
-                    filter[field] = $(this).val()
-                    i.setfilter(filter).reload()
-                }).submit(function () {
+                    i.setfilter($(this).serializeArray()).reload()
+                }).submit(function (e) {
+                    e.preventDefault();
                     //提交过滤表单时重新加载列表
                     i.setfilter($(this).serializeArray()).reload()
                     return false;
-                })
+                }).serializeArray()
                 return filter;
             },//传入初始条件
             loadprocess:function (i) {//过滤参数

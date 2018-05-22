@@ -53,7 +53,6 @@
         if(!window.history.state[self.idx]){//如果没有历史过滤值则使用初始过滤值
             this.filter=$.extend({},this.option.filter)//过滤器
         }
-        //this.print()
     }
     i.prototype.init=function () {
         var self = this
@@ -129,12 +128,11 @@
             if($(self.c).scrollTop()==0 && bst){
                 ms = e.originalEvent.changedTouches[0].clientY;
             }
-            if(ms>0 && e.originalEvent.changedTouches[0].clientY>ms){
+            /*if(ms>0 && e.originalEvent.changedTouches[0].clientY>ms){
                 var di = e.originalEvent.changedTouches[0].clientY-ms
                 console.log(di)
                 $(self.target).css('margin-top',di)
-
-            }
+            }*/
             self.st = $(self.c).scrollTop();
             e.stopPropagation()
         })
@@ -156,9 +154,7 @@
         })
         $.ajax(ajax)
     }
-    i.prototype.print=function () {
-        console.log(this)
-    }
+
     i.prototype.setfilter=function (f) {
         var filter={};
         if(f instanceof Array){
