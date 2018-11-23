@@ -17,7 +17,7 @@
    灵活支持各种过滤参数。 
    一个页面支持多个实例。
 
- 文档参见:https://machao1989.github.io/mloader/index.html
+ 文档参见:https://machao1989.github.io/mloader/demo/index.html
  
  查看[Demo](http://tbhchao101.7debusx.c28.542b.top//mload/demo/index.html)
 
